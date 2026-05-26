@@ -123,6 +123,75 @@
       margin-bottom: 28px;
     }
 
+    /* ── COUNTDOWN ───────────────────────────────────────── */
+    .countdown {
+      margin: 0 0 32px;
+    }
+
+    .countdown-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 14px;
+    }
+
+    .countdown-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(8px, 1.5vw, 16px);
+    }
+
+    .countdown-cell {
+      flex: 0 0 auto;
+      min-width: clamp(72px, 14vw, 120px);
+      padding: clamp(10px, 1.6vw, 18px) clamp(12px, 2vw, 22px);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      text-align: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .countdown-num {
+      display: block;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+      color: var(--white);
+    }
+
+    .countdown-unit {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+
+    .countdown-started {
+      display: inline-block;
+      padding: 16px 24px;
+      background: var(--orange);
+      color: var(--black);
+      border-radius: 14px;
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 420px) {
+      .countdown-cell { min-width: calc(25% - 8px); padding: 10px 6px; }
+    }
+
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
@@ -478,6 +547,16 @@
 
       <div class="hero-meta">Зона отдыха «Лесная» · Центральный парк</div>
 
+      <div class="countdown" id="countdown" aria-live="polite">
+        <div class="countdown-label">До фестиваля осталось</div>
+        <div class="countdown-grid" id="countdown-grid">
+          <div class="countdown-cell"><span class="countdown-num" id="cd-days">00</span><span class="countdown-unit">дней</span></div>
+          <div class="countdown-cell"><span class="countdown-num" id="cd-hours">00</span><span class="countdown-unit">часов</span></div>
+          <div class="countdown-cell"><span class="countdown-num" id="cd-mins">00</span><span class="countdown-unit">минут</span></div>
+          <div class="countdown-cell"><span class="countdown-num" id="cd-secs">00</span><span class="countdown-unit">секунд</span></div>
+        </div>
+      </div>
+
       <div class="hero-actions">
         <a class="btn-primary" href="https://forms.yandex.ru/u/6a105e19068ff0cc9831fa2d" target="_blank" rel="noopener">Хочу на фест →</a>
         <a class="btn-outline" href="https://forms.yandex.ru/u/6a105ebd1f1eb5c76c0c6d68" target="_blank" rel="noopener">Стать соавтором</a>
@@ -589,5 +668,40 @@
     </footer>
 
   </div>
+  <script>
+    (function () {
+      // 26 июня 2026, 12:00 МСК (UTC+3)
+      var target = new Date('2026-06-26T12:00:00+03:00').getTime();
+      var root = document.getElementById('countdown');
+      var elDays = document.getElementById('cd-days');
+      var elHours = document.getElementById('cd-hours');
+      var elMins = document.getElementById('cd-mins');
+      var elSecs = document.getElementById('cd-secs');
+      var timer = null;
+
+      function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+      function render() {
+        var diff = target - Date.now();
+        if (diff <= 0) {
+          if (timer) { clearInterval(timer); timer = null; }
+          root.innerHTML = '<div class="countdown-started">Фестиваль уже начался</div>';
+          return;
+        }
+        var s = Math.floor(diff / 1000);
+        var days = Math.floor(s / 86400);
+        var hours = Math.floor((s % 86400) / 3600);
+        var mins = Math.floor((s % 3600) / 60);
+        var secs = s % 60;
+        elDays.textContent = pad(days);
+        elHours.textContent = pad(hours);
+        elMins.textContent = pad(mins);
+        elSecs.textContent = pad(secs);
+      }
+
+      render();
+      timer = setInterval(render, 1000);
+    })();
+  </script>
 </body>
 </html>
